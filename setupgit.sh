@@ -8,9 +8,12 @@ set -e
 
 echo "Setting up GIT!"
 
+read -p "Enter your username: " USER_NAME
+read -p "Enter your GIT email: " USER_EMAIL
+
 echo "Setting username and email..."
-git config --global user.name "user"
-git config --global user.email "email@provider.com"
+git config --global user.name $USER_NAME
+git config --global user.email $USER_EMAIL
 
 echo "Setting default branch..."
 git config --global init.defaultBranch master
@@ -26,5 +29,31 @@ git config --get user.name
 git config --get user.email
 
 echo "Setting up SSH and finishing setup..."
-ssh-keygen -t ed25519 -C "email@provider.com" -N "" -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
+ssh-keygen -t ed25519 -C $USER_EMAIL -N "" -f ~/.ssh/id_rsa <<<y >/dev/null 2>&1
 
+cat <<EOF
+Host github.com
+    StrictHostKeyChecking no
+EOF
+
+echo "Your GitHub ssh key is: "
+
+cat ~/.ssh/id_rsa.pub
+
+read -p "Have you entered your ssh key in GitHub settings? [yY/nN] " HAS_COPIED_SSH_KEY
+
+case $HAS_COPIED_SSH_KEY in
+        [yY]*)
+                echo "SSHing into github.com..."
+                ssh -T git@github.com
+                ;;
+        [nN]*)
+                read -p "Have you entered your ssh key in GitHub settings? [yY/nN] " HAS_COPIED_SSH_KEY
+                ;;
+        *)
+                echo "An error has occured... exiting."
+                exit 1
+                ;;
+esac
+
+echo "Done!"
