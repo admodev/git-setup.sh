@@ -45,6 +45,7 @@ read -p "Have you entered your ssh key in GitHub settings? [yY/nN] " HAS_COPIED_
 case $HAS_COPIED_SSH_KEY in
         [yY]*)
                 echo "SSHing into github.com..."
+                # TODO!: add a selection of desired platform to test connection (github, gitlab, bitbucket...)
                 ssh -T git@github.com
                 ;;
         [nN]*)
